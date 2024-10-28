@@ -1,0 +1,1 @@
+Discord bot that saves the users in a server
