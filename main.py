@@ -11,6 +11,9 @@ DISCORD_TOKEN = str(os.getenv('DISCORD_TOKEN'))
 SERVER_ID = str(os.getenv('SERVER_ID'))
 DB_PATH = str(os.getenv('DB_PATH'))
 
+image_manager = ImageManager() #Mange the google drive save images
+
+
 intents = discord.Intents.default()
 intents.members = True
 
@@ -30,16 +33,16 @@ def calculate_hash(file_path):
 async def insert_member(member:discord.Member):
     db = Db(DB_PATH)
 
+    #need_img_save = True
+
     image_path = "to_check_avatar.png"
     print(member.avatar.url) #type:ignore
-    correct_download = await ImageDownlader.save_avatar(member.avatar.url,image_path) #type:ignore
+    correct_download = await ImageManager.save_avatar_local(member.avatar.url,image_path) #type:ignore
     image_hash = calculate_hash(image_path)
 
     try:
         print(member.name)
-        last_user,last_name,last_image_path = db.get_last_info(member.name) # Can throw error if the db is empty or the user doesn't exists
-        last_image_hash = calculate_hash(last_image_path)
-        
+        last_user,last_name,last_image_path,last_image_hash = db.get_last_info(member.name) # Can throw error if the db is empty or the user doesn't exists
             
 
         if correct_download == False:
@@ -47,13 +50,23 @@ async def insert_member(member:discord.Member):
         if last_user == member.name and last_name == member.display_name and last_image_hash == image_hash:
             return False
 
-        if last_image_hash == image_hash:
-            image_path = last_image_path
+        #This is only if you don't want to have repeated photos
+        #if last_image_hash == image_hash:
+            #image_path = last_image_path
+            #need_img_save = False
 
-    except Exception as e:
-        print(e,";",type(e))
+    except TypeError as e:
+        pass
     
-    print(db.insert(member.name,member.display_name,image_path))
+    
+    id = db.get_next_id()
+    img_name = Utils.get_img_name(str(id),member.name,member.display_name)
+
+    db.insert(member.name,member.display_name,img_name,image_hash)
+    await image_manager.save_image(img_name,image_path)
+
+    os.remove(image_path)
+
     db.close()
 
 
@@ -61,15 +74,15 @@ async def insert_member(member:discord.Member):
 async def on_member_update(before:discord.Member,after:discord.Member):
     print("Changes detected")
     await insert_member(after)
-    #print(f"Before:{before.name}#{before.discriminator};{before.display_name},{before.display_avatar}")
-    #print(f"After:{after.name}#{after.discriminator};{after.display_name},{after.display_avatar}")
     print("\n")
 
 
 @client.event
 async def on_ready():
+    
+
     print(f'Logged in as {client.user}!')
-    #client.loop.create_task(fetch_and_print_members())  # Start the member fetching task
+    
 
 client.run(DISCORD_TOKEN)
 
