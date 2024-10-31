@@ -1,5 +1,4 @@
-import sqlite3,pytz,hashlib,aiohttp,os
-import discord
+import sqlite3,pytz,aiohttp
 from datetime import datetime
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive

@@ -2,7 +2,6 @@
 import os
 import hashlib
 import discord
-import asyncio
 from dotenv import load_dotenv
 from utils import *
 
