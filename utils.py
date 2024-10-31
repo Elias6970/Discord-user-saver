@@ -55,10 +55,9 @@ class ImageManager:
 
         self.drive = GoogleDrive(gauth)
 
-    async def save_image(self,name:str,image_path:str):
-        file = self.drive.CreateFile()
+    async def save_image(self,name:str,image_path:str,folder_id:str):
+        file = self.drive.CreateFile({'title': name, 'parents': [{'id': folder_id}]})
         file.SetContentFile(image_path)
-        file['title'] = name
         file.Upload()
         print("Correct uploaded")
 

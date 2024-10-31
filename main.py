@@ -10,6 +10,7 @@ load_dotenv()
 DISCORD_TOKEN = str(os.getenv('DISCORD_TOKEN'))
 SERVER_ID = str(os.getenv('SERVER_ID'))
 DB_PATH = str(os.getenv('DB_PATH'))
+FOLDER_ID = str(os.getenv('FOLDER_ID'))
 
 image_manager = ImageManager() #Mange the google drive save images
 
@@ -60,7 +61,7 @@ async def insert_member(member:discord.Member):
     img_name = Utils.get_img_name(str(id),member.name,member.display_name)
 
     db.insert(member.name,member.display_name,img_name,image_hash)
-    await image_manager.save_image(img_name,image_path)
+    await image_manager.save_image(img_name,image_path,FOLDER_ID)
 
     os.remove(image_path)
 
