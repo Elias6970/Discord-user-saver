@@ -1,4 +1,4 @@
-import sqlite3,pytz,aiohttp
+import sqlite3,pytz,aiohttp,os
 from datetime import datetime
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
@@ -53,7 +53,7 @@ class ImageManager:
         gauth = GoogleAuth()
         gauth.auth_method = 'service'
         gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            keyname_file, 
+            os.path.join("/etc","secrets",keyname_file), 
             scopes='https://www.googleapis.com/auth/drive'
         )
 
