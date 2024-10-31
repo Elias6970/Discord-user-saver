@@ -3,6 +3,7 @@ import discord
 from datetime import datetime
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
+from oauth2client.service_account import ServiceAccountCredentials
 
 class Db:
     def __init__(self,db_path) -> None:
@@ -49,11 +50,19 @@ class Db:
 
 
 class ImageManager:
-    def __init__(self) -> None:
+    def __init__(self,keyname_file:str) -> None:
         gauth = GoogleAuth()
-        gauth.LocalWebserverAuth()
+        gauth.auth_method = 'service'
+        gauth.credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            keyname_file, 
+            scopes='https://www.googleapis.com/auth/drive'
+        )
 
+        # Initialize the drive instance
         self.drive = GoogleDrive(gauth)
+
+
+
 
     async def save_image(self,name:str,image_path:str,folder_id:str):
         file = self.drive.CreateFile({'title': name, 'parents': [{'id': folder_id}]})

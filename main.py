@@ -11,8 +11,9 @@ DISCORD_TOKEN = str(os.getenv('DISCORD_TOKEN'))
 SERVER_ID = str(os.getenv('SERVER_ID'))
 DB_PATH = str(os.getenv('DB_PATH'))
 FOLDER_ID = str(os.getenv('FOLDER_ID'))
+KEYNAME_FILE = str(os.getenv('KEYNAME_FILE'))
 
-image_manager = ImageManager() #Mange the google drive save images
+image_manager = ImageManager(KEYNAME_FILE) #Mange the google drive save images
 
 
 intents = discord.Intents.default()
