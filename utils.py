@@ -48,7 +48,7 @@ class Db:
         self.connector.close()
 
 
-class ImageManager:
+class GoogleDriveSaver:
     def __init__(self,keyname_file:str) -> None:
         gauth = GoogleAuth()
         gauth.auth_method = 'service'
@@ -61,14 +61,31 @@ class ImageManager:
         self.drive = GoogleDrive(gauth)
 
 
+    async def save_db(self,image_path:str,folder_id:str):
+        file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title = '{image_path}'"}).GetList()
+
+        if file_list:
+            file_id = file_list[0]["id"]
+            file = self.drive.CreateFile({'id':file_id})
+            file.SetContentFile(image_path)
+            file.Upload()
+        else:
+            await self.save_anything(image_path,image_path,folder_id)
+
+        print("DB saved\n")
 
 
     async def save_image(self,name:str,image_path:str,folder_id:str):
+        await self.save_anything(name,image_path,folder_id)
+        print("Image saved\n")
+
+    
+    #Saves anything
+    async def save_anything(self,name:str,image_path:str,folder_id:str):
         file = self.drive.CreateFile({'title': name, 'parents': [{'id': folder_id}]})
         file.SetContentFile(image_path)
         file.Upload()
-        print("Correct uploaded")
-
+        
     
     @staticmethod
     async def save_avatar_local(url,path):

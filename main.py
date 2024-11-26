@@ -1,18 +1,17 @@
 # bot.py
-import os
-import hashlib
-import discord
+import os,hashlib,discord,asyncio
+from datetime import timedelta
 from dotenv import load_dotenv
 from utils import *
 
-load_dotenv()
+load_dotenv(override=True)
 DISCORD_TOKEN = str(os.getenv('DISCORD_TOKEN'))
 SERVER_ID = str(os.getenv('SERVER_ID'))
 DB_PATH = str(os.getenv('DB_PATH'))
 FOLDER_ID = str(os.getenv('FOLDER_ID'))
 KEYNAME_FILE = str(os.getenv('KEYNAME_FILE'))
 
-image_manager = ImageManager(KEYNAME_FILE) #Mange the google drive save images
+gDriveManager = GoogleDriveSaver(KEYNAME_FILE) #Mange the google drive save images
 
 
 intents = discord.Intents.default()
@@ -29,6 +28,17 @@ def calculate_hash(file_path):
     return hasher.hexdigest()
 
 
+#Saves the db in google drive one time per day
+async def save_db_daily():
+    while True:
+        now = datetime.now()
+        # Calculate time until the next 24-hour interval
+        next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        delay = (next_run - now).total_seconds()
+        await asyncio.sleep(delay)
+        await gDriveManager.save_db(DB_PATH,FOLDER_ID)
+        
+
 
 
 async def insert_member(member:discord.Member):
@@ -37,7 +47,7 @@ async def insert_member(member:discord.Member):
     #need_img_save = True
 
     image_path = "to_check_avatar.png"
-    correct_download = await ImageManager.save_avatar_local(member.avatar.url,image_path) #type:ignore
+    correct_download = await GoogleDriveSaver.save_avatar_local(member.avatar.url,image_path) #type:ignore
     image_hash = calculate_hash(image_path)
 
     try:
@@ -61,7 +71,7 @@ async def insert_member(member:discord.Member):
     img_name = Utils.get_img_name(str(id),member.name,member.display_name)
 
     db.insert(member.name,member.display_name,img_name,image_hash)
-    await image_manager.save_image(img_name,image_path,FOLDER_ID)
+    await gDriveManager.save_image(img_name,image_path,FOLDER_ID)
 
     os.remove(image_path)
 
@@ -72,11 +82,11 @@ async def insert_member(member:discord.Member):
 async def on_member_update(before:discord.Member,after:discord.Member):
     print("Changes detected")
     await insert_member(after)
-    print()
 
 
 @client.event
 async def on_ready():
+    asyncio.create_task(save_db_daily())
     print(f'Logged in as {client.user}!')
     
 
