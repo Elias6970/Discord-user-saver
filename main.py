@@ -1,5 +1,6 @@
 # bot.py
 import os,hashlib,discord,asyncio
+from discord.ext import commands
 from datetime import timedelta
 from dotenv import load_dotenv
 from utils import *
@@ -16,8 +17,10 @@ gDriveManager = GoogleDriveSaver(KEYNAME_FILE) #Mange the google drive save imag
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!",intents=intents)
 
 
 def calculate_hash(file_path):
@@ -77,18 +80,36 @@ async def insert_member(member:discord.Member):
 
     db.close()
 
+@bot.command(name="nombres")
+async def last_names(ctx):
+    print("Names command detected")
+    standard_out = "Todos tus nombres:\n\t"
+    try:
+        db = Db(DB_PATH)
+        all_names = db.get_all_user_names(ctx.author.name)
+        if all_names == []:
+            raise NoLastNames
+        
+        await ctx.author.send(standard_out + "\n".join(all_names))
+        await ctx.send("Te envio los nombre por privado!")  # Optional feedback in the server
+    
+    except discord.Forbidden:
+        await ctx.send("I couldn't send you a DM. Please check your privacy settings!")
+    
+    except NoLastNames:
+        await ctx.send("You don't have past names")
 
-@client.event
+@bot.event
 async def on_member_update(before:discord.Member,after:discord.Member):
     print("Changes detected")
     await insert_member(after)
 
 
-@client.event
+@bot.event
 async def on_ready():
     asyncio.create_task(save_db_daily())
     print(f'Logged in as {client.user}!')
     
 
-client.run(DISCORD_TOKEN)
-
+#client.run(DISCORD_TOKEN)
+bot.run(DISCORD_TOKEN)
