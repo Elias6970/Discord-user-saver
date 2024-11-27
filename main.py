@@ -1,5 +1,6 @@
 # bot.py
 import os,hashlib,discord,asyncio
+import matplotlib.pyplot as plt
 from discord.ext import commands
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -80,8 +81,8 @@ async def insert_member(member:discord.Member):
 
     db.close()
 
-@bot.command(name="nombres")
-async def last_names(ctx):
+@bot.command(name="yo")
+async def get_last_names(ctx):
     print("Names command detected")
     standard_out = "Todos tus nombres:\n\t"
     try:
@@ -98,6 +99,35 @@ async def last_names(ctx):
     
     except NoLastNames:
         await ctx.send("You don't have past names")
+
+#Send a chart with who has more different names
+@bot.command(name="grafico")
+async def get_graphic_names(ctx):
+    print("Graphic command")
+    try:
+        db = Db(DB_PATH)
+        graph_file_name = "graph.png"
+        info = db.get_names_per_user()
+
+        values = list(map(lambda x: x[1],info))
+        labels = list(map(lambda x: x[0],info))
+
+        plt.pie(x=values,labels=labels,autopct='%1.1f%%', 
+            startangle=180, pctdistance=0.85,
+            wedgeprops={'edgecolor': 'black'},
+            textprops={'fontsize': 9})
+        plt.title("Nombres por usuario")
+        plt.axis('equal')
+        plt.savefig(graph_file_name)
+
+        #Send the photo
+        file = discord.File(graph_file_name, filename=graph_file_name)
+        await ctx.send(file=file)
+
+        os.remove(graph_file_name) #Delete the graphic from the repo
+
+    except discord.Forbidden:
+        pass
 
 @bot.event
 async def on_member_update(before:discord.Member,after:discord.Member):

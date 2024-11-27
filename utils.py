@@ -13,6 +13,9 @@ class Db:
 
         self.cursor.execute(f"CREATE TABLE IF NOT EXISTS {self.table_name}(ID INTEGER PRIMARY KEY AUTOINCREMENT,USER TEXT, NAME TEXT, IMAGE TEXT, IMAGE_HASH, CREATED_AT DATE)")
         self.connector.commit()
+    
+    def __del__(self):
+        self.close()
 
     #Return the id of the insert
     def insert(self,user:str,name:str,image:str,image_hash:str):
@@ -43,7 +46,16 @@ class Db:
             return [i[0] for i in select]
         except Exception:
             return []
-
+    
+    #Return the number of different names per user
+    def get_names_per_user(self):
+        select = self.cursor.execute(f"""
+                                     SELECT USER,COUNT(*) AS COUNT
+                                     FROM {self.table_name}
+                                     GROUP BY USER
+                                     ORDER BY COUNT DESC
+                                     """).fetchall()
+        return select
     def get_next_id(self):
         select = self.cursor.execute(f"SELECT SEQ FROM SQLITE_SEQUENCE WHERE NAME = 'NAMES'").fetchone()
         if select == None:
