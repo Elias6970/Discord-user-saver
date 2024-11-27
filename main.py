@@ -129,6 +129,20 @@ async def get_graphic_names(ctx):
     except discord.Forbidden:
         pass
 
+#Send a message with all users amount of names they have had
+@bot.command(name="stats")
+async def get_stats(ctx):
+    db = Db(DB_PATH)
+    info = db.get_names_per_user()
+    position = 1
+    returning_str = "## Nombres por usuario\n\t"
+    
+    for i in info:
+        returning_str += str(position) + ". " + str(i[0]) + ": " + str(i[1]) + " nombres\n\t"
+        position += 1
+    
+    await ctx.send(returning_str)
+
 @bot.event
 async def on_member_update(before:discord.Member,after:discord.Member):
     print("Changes detected")
