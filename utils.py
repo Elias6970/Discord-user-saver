@@ -1,4 +1,4 @@
-import sqlite3,pytz,aiohttp
+import sqlite3,pytz,aiohttp,random,string
 from datetime import datetime
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
@@ -61,9 +61,15 @@ class Db:
         if select == None:
             return 1
         return select[0] + 1
-    
-    def close(self):
+
+    def fill_db(self):
+        users = ["noah","pablo","mario","fran","adrian"]
+        for i in users:
+            for j in range(random.randint(1,15)):
+                self.insert(i,str(i)+Utils.generate_random_string(random.randint(1,5)),"","")
         self.connector.commit()
+        
+    def close(self):
         self.connector.close()
 
 
@@ -128,6 +134,11 @@ class Utils:
         if name.endswith(".png"):
             name = name[:-4]
         return name.split(";k;")
-
+    
+    @staticmethod
+    def generate_random_string(length):
+        random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+        return random_str
+    
 class NoLastNames(Exception):
     pass

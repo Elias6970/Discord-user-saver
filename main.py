@@ -2,6 +2,7 @@
 import os,hashlib,discord,asyncio
 import matplotlib.pyplot as plt
 from discord.ext import commands
+from tabulate import tabulate
 from datetime import timedelta
 from dotenv import load_dotenv
 from utils import *
@@ -84,7 +85,7 @@ async def insert_member(member:discord.Member):
 @bot.command(name="yo")
 async def get_last_names(ctx):
     print("Names command detected")
-    standard_out = "Todos tus nombres:\n\t"
+    standard_out = "## Todos tus nombres:\n\t"
     try:
         db = Db(DB_PATH)
         all_names = db.get_all_user_names(ctx.author.name)
@@ -134,13 +135,14 @@ async def get_graphic_names(ctx):
 async def get_stats(ctx):
     db = Db(DB_PATH)
     info = db.get_names_per_user()
+
     position = 1
-    returning_str = "## Nombres por usuario\n\t"
+    returning_str = "## Nombres por usuario\n"
     
     for i in info:
-        returning_str += str(position) + ". " + str(i[0]) + ": " + str(i[1]) + " nombres\n\t"
+        returning_str += str(position) + ". " + str(i[0]) + ": " + str(i[1]) + " nombres\n"
         position += 1
-    
+    print(returning_str)
     await ctx.send(returning_str)
 
 @bot.event
