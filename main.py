@@ -2,7 +2,6 @@
 import os,hashlib,discord,asyncio
 import matplotlib.pyplot as plt
 from discord.ext import commands
-from tabulate import tabulate
 from datetime import timedelta
 from dotenv import load_dotenv
 from utils import *
@@ -92,7 +91,7 @@ async def get_last_names(ctx):
         if all_names == []:
             raise NoLastNames
         
-        await ctx.author.send(standard_out + "\n".join(all_names))
+        await ctx.author.send(standard_out + "\n\t".join(all_names))
         await ctx.send("Te envio los nombre por privado!")  # Optional feedback in the server
     
     except discord.Forbidden:
