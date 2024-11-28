@@ -2,3 +2,4 @@ env
 .env
 *.db
 client_secrets.json
+__pycache__
