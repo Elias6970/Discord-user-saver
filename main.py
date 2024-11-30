@@ -20,7 +20,7 @@ intents.members = True
 intents.message_content = True
 
 client = discord.Client(intents=intents)
-bot = commands.Bot(command_prefix="!",intents=intents)
+bot = commands.Bot(command_prefix=";",intents=intents)
 
 
 
