@@ -140,17 +140,21 @@ class GoogleDriveSaver:
         return False
 
 
-
+#Utility functions class
 class Utils:
+    splitter = ";k;" #String to split info in images names
+
+    #Get the name for an image
     @staticmethod
     def get_img_name(id:str|int,user:str,name:str) -> str:
-        return str(id) + ";k;" + user + ";k;" + name + ".png"
+        return str(id) + Utils.splitter + user + Utils.splitter + name + ".png"
     
+    #Get the information from the name of an image
     @staticmethod
     def get_data_from_img_name(name:str) -> list[str]:
         if name.endswith(".png"):
             name = name[:-4]
-        return name.split(";k;")
+        return name.split(Utils.splitter)
     
     @staticmethod
     def generate_random_string(length):
