@@ -83,7 +83,7 @@ async def insert_member(member:discord.Member):
 #######################################
 
 #Command to send to a user all his names in a dm
-@bot.command(name="yo")
+@bot.command(name="yo",help="Envia todos tus nombres anteriores por dm")
 async def get_last_names(ctx):
     print("Names command detected")
     standard_out = "## Todos tus nombres:\n\t"
@@ -103,7 +103,7 @@ async def get_last_names(ctx):
         await ctx.send("You don't have past names")
 
 #Send a chart with who has had more different names
-@bot.command(name="grafico")
+@bot.command(name="grafico",help="Grafico con nombres por usuario")
 async def get_graphic_names(ctx):
     print("Graphic command")
     try:
@@ -132,7 +132,7 @@ async def get_graphic_names(ctx):
         pass
 
 #Send a message with the amount of names that every user have had
-@bot.command(name="stats")
+@bot.command(name="stats",help="Ranking: cantidad de nombres por usuario")
 async def get_stats(ctx):
     db = Db(DB_PATH)
     info = db.get_names_per_user()
@@ -145,10 +145,6 @@ async def get_stats(ctx):
         position += 1
     print(returning_str)
     await ctx.send(returning_str)
-
-@bot.command(name="a")
-async def a(ctx):
-    pass
 
 
 #######################################
