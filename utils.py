@@ -48,6 +48,11 @@ class Db:
         except Exception:
             return []
     
+    #Return the image name for an id
+    def get_img_name(self,id):
+        select = self.cursor.execute(f"SELECT IMAGE FROM {self.table_name} WHERE ID = ?",(id,)).fetchone()
+        return select[0]
+    
     #Return the number of different names per user
     def get_names_per_user(self):
         select = self.cursor.execute(f"""
@@ -107,15 +112,29 @@ class GoogleDriveSaver:
 
     async def save_image(self,name:str,image_path:str,folder_id:str):
         await self.save_anything(name,image_path,folder_id)
-        print("Image saved\n")
+        print("Image saved")
 
+    async def download_image(self,img_name:str,folder_id:str):
+        await self.download_anything(img_name,folder_id)
+        print("Image downloaded")
     
     #Saves anything
     async def save_anything(self,name:str,image_path:str,folder_id:str):
         file = self.drive.CreateFile({'title': name, 'parents': [{'id': folder_id}]})
         file.SetContentFile(image_path)
         file.Upload()
-        
+    
+    #Download a file from google drive
+    async def download_anything(self,file_name:str,folder_id:str):
+        file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title='{file_name}' and trashed=false"}).GetList()
+
+        if not file_list:
+            raise FileNotFoundError
+
+        # Assuming no duplicate names, take the first match
+        file_to_download = file_list[0]
+        file_to_download.GetContentFile(file_name)
+    
     #Downloads the avatar from discord and saves it in the repo root folder
     @staticmethod
     async def save_avatar_local(url,path):

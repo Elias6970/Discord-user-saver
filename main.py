@@ -146,6 +146,25 @@ async def get_stats(ctx):
     print(returning_str)
     await ctx.send(returning_str)
 
+#Send the image with the gotten id
+@bot.command(name="foto",help="Devuelve la foto con ese id. Se puede combinar con stats para saber los ids")
+async def return_photo(ctx,message:str):
+    db = Db(DB_PATH)
+
+    try:
+        image_name = db.get_img_name(message)
+        
+        await gDriveManager.download_image(image_name,FOLDER_ID)
+
+        file = discord.File(image_name, filename=image_name)
+        await ctx.send(image_name,file=file)
+
+        os.remove(image_name)
+        
+        print("Image sent")
+    
+    except Exception:
+        await ctx.send("Image not found")
 
 #######################################
 ###-------------EVENTS--------------###
