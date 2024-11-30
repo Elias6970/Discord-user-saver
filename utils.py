@@ -40,11 +40,11 @@ class Db:
         select = self.cursor.execute(f"SELECT USER,NAME,IMAGE,IMAGE_HASH FROM {self.table_name} WHERE USER = ? ORDER BY CREATED_AT DESC LIMIT 1",(user,)).fetchone()
         return select
     
-    #Return a list with all user names
-    def get_all_user_names(self,user:str) -> list:
-        select = self.cursor.execute(f"SELECT NAME FROM {self.table_name} WHERE USER = ? ORDER BY CREATED_AT ASC",(user,)).fetchall()
+    #Return a list with all user (id,name)
+    def get_all_user_id_and_name(self,user:str) -> list:
+        select = self.cursor.execute(f"SELECT ID,NAME FROM {self.table_name} WHERE USER = ? ORDER BY CREATED_AT ASC",(user,)).fetchall()
         try:
-            return [i[0] for i in select]
+            return select
         except Exception:
             return []
     

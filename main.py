@@ -86,14 +86,14 @@ async def insert_member(member:discord.Member):
 @bot.command(name="yo",help="Envia todos tus nombres anteriores por dm")
 async def get_last_names(ctx):
     print("Names command detected")
-    standard_out = "## Todos tus nombres:\n\t"
+    standard_out = "## Todos tus nombres:\nid\tname\n"
     try:
         db = Db(DB_PATH)
-        all_names = db.get_all_user_names(ctx.author.name)
+        all_names = db.get_all_user_id_and_name(ctx.author.name)
         if all_names == []:
             raise NoLastNames
-        
-        await ctx.author.send(standard_out + "\n\t".join(all_names))
+        print(all_names)
+        await ctx.author.send(standard_out + "\n".join([str(i[0])+"\t"+str(i[1]) for i in all_names]))
         await ctx.send("Te envio los nombre por privado!")  # Optional feedback in the server
     
     except discord.Forbidden:
