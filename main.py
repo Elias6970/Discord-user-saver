@@ -82,6 +82,7 @@ async def insert_member(member:discord.Member):
 ###------------COMMMANDS------------###
 #######################################
 
+#Command to send to a user all his names in a dm
 @bot.command(name="yo")
 async def get_last_names(ctx):
     print("Names command detected")
@@ -101,7 +102,7 @@ async def get_last_names(ctx):
     except NoLastNames:
         await ctx.send("You don't have past names")
 
-#Send a chart with who has more different names
+#Send a chart with who has had more different names
 @bot.command(name="grafico")
 async def get_graphic_names(ctx):
     print("Graphic command")
@@ -130,7 +131,7 @@ async def get_graphic_names(ctx):
     except discord.Forbidden:
         pass
 
-#Send a message with all users amount of names they have had
+#Send a message with the amount of names that every user have had
 @bot.command(name="stats")
 async def get_stats(ctx):
     db = Db(DB_PATH)
