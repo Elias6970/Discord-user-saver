@@ -1,4 +1,4 @@
-import sqlite3,pytz,aiohttp,random,string
+import sqlite3,pytz,aiohttp,random,string,hashlib
 from datetime import datetime
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
@@ -85,17 +85,17 @@ class GoogleDriveSaver:
         # Initialize the drive instance
         self.drive = GoogleDrive(gauth)
 
+    #Save the db if there is any change compare to the google drive version.
+    async def save_db(self,db_path:str,folder_id:str):
+        file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title = '{db_path}'"}).GetList()
 
-    async def save_db(self,image_path:str,folder_id:str):
-        file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title = '{image_path}'"}).GetList()
-
-        if file_list:
+        if file_list and not self.is_in_drive(db_path,folder_id):
             file_id = file_list[0]["id"]
             file = self.drive.CreateFile({'id':file_id})
-            file.SetContentFile(image_path)
+            file.SetContentFile(db_path)
             file.Upload()
         else:
-            await self.save_anything(image_path,image_path,folder_id)
+            await self.save_anything(db_path,db_path,folder_id)
 
         print("DB saved\n")
 
@@ -124,6 +124,18 @@ class GoogleDriveSaver:
         return False
 
 
+    #Check if the file exist in google drive. Not only the name. The same file.
+    async def is_in_drive(self,file_path:str,folder_id:str):
+        file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title='{file_path}' and trashed=false"}).GetList()
+        
+        if file_list:
+            local_file_md5 = Utils.calculate_hash(file_path)
+            for i in file_list:
+                if 'md5Checksum' in i and i['md5Checksum'] == local_file_md5:
+                    return True
+        
+        return False
+
 class Utils:
     @staticmethod
     def get_img_name(id:str|int,user:str,name:str) -> str:
@@ -139,6 +151,14 @@ class Utils:
     def generate_random_string(length):
         random_str = ''.join(random.choices(string.ascii_letters + string.digits, k=length))
         return random_str
+    
+    @staticmethod
+    def calculate_hash(file_path):
+        hasher = hashlib.md5()
+        with open(file_path, 'rb') as f:
+            buf = f.read()
+            hasher.update(buf)
+        return hasher.hexdigest()
     
 class NoLastNames(Exception):
     pass

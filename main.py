@@ -24,23 +24,20 @@ client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix="!",intents=intents)
 
 
-def calculate_hash(file_path):
-    hasher = hashlib.md5()
-    with open(file_path, 'rb') as f:
-        buf = f.read()
-        hasher.update(buf)
-    return hasher.hexdigest()
+
 
 
 #Saves the db in google drive one time per day
-async def save_db_daily():
+async def save_db_hourly():
     while True:
         now = datetime.now()
         # Calculate time until the next 24-hour interval
-        next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+        next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
         delay = (next_run - now).total_seconds()
+
         await asyncio.sleep(delay)
         await gDriveManager.save_db(DB_PATH,FOLDER_ID)
+        print("Updated database")
         
 
 
@@ -52,7 +49,7 @@ async def insert_member(member:discord.Member):
 
     image_path = "to_check_avatar.png"
     correct_download = await GoogleDriveSaver.save_avatar_local(member.avatar.url,image_path) #type:ignore
-    image_hash = calculate_hash(image_path)
+    image_hash = Utils.calculate_hash(image_path)
 
     try:
         last_user,last_name,last_image_path,last_image_hash = db.get_last_info(member.name) # Can throw error if the db is empty or the user doesn't exists
@@ -144,6 +141,10 @@ async def get_stats(ctx):
     print(returning_str)
     await ctx.send(returning_str)
 
+@bot.command(name="a")
+async def a(ctx):
+    pass
+
 @bot.event
 async def on_member_update(before:discord.Member,after:discord.Member):
     print("Changes detected")
@@ -152,8 +153,9 @@ async def on_member_update(before:discord.Member,after:discord.Member):
 
 @bot.event
 async def on_ready():
-    asyncio.create_task(save_db_daily())
+    asyncio.create_task(save_db_hourly())
     print(f'Logged in as {client.user}!')
+    
     
 
 #client.run(DISCORD_TOKEN)
