@@ -93,7 +93,7 @@ class GoogleDriveSaver:
         file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title = '{db_path}'"}).GetList()
 
         if file_list:
-            if not self.is_in_drive(db_path,folder_id):
+            if not await self.is_in_drive(db_path,folder_id):
                 file_id = file_list[0]["id"]
                 file = self.drive.CreateFile({'id':file_id})
                 file.SetContentFile(db_path)
