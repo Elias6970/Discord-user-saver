@@ -4,6 +4,7 @@ from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
 
+#Wrapper for the db
 class Db:
     def __init__(self,db_path) -> None:
         self.db_path = db_path
@@ -73,6 +74,8 @@ class Db:
         self.connector.close()
 
 
+
+#Class for manage the interaction with google drive
 class GoogleDriveSaver:
     def __init__(self,keyname_file:str) -> None:
         gauth = GoogleAuth()
@@ -111,7 +114,7 @@ class GoogleDriveSaver:
         file.SetContentFile(image_path)
         file.Upload()
         
-    
+    #Downloads the avatar from discord and saves it in the repo root folder
     @staticmethod
     async def save_avatar_local(url,path):
         avatar_url = url  # Get the avatar URL
@@ -135,6 +138,8 @@ class GoogleDriveSaver:
                     return True
         
         return False
+
+
 
 class Utils:
     @staticmethod
@@ -160,5 +165,7 @@ class Utils:
             hasher.update(buf)
         return hasher.hexdigest()
     
+
+#Error class
 class NoLastNames(Exception):
     pass
