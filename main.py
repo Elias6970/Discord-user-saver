@@ -36,7 +36,7 @@ async def save_db_hourly():
 
         await asyncio.sleep(delay)
         await gDriveManager.save_db(DB_PATH,FOLDER_ID)
-        print("Updated database")
+        print("Checked db updates")
         
 
 

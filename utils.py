@@ -92,11 +92,13 @@ class GoogleDriveSaver:
     async def save_db(self,db_path:str,folder_id:str):
         file_list = self.drive.ListFile({'q': f"'{folder_id}' in parents and title = '{db_path}'"}).GetList()
 
-        if file_list and not self.is_in_drive(db_path,folder_id):
-            file_id = file_list[0]["id"]
-            file = self.drive.CreateFile({'id':file_id})
-            file.SetContentFile(db_path)
-            file.Upload()
+        if file_list:
+            if not self.is_in_drive(db_path,folder_id):
+                file_id = file_list[0]["id"]
+                file = self.drive.CreateFile({'id':file_id})
+                file.SetContentFile(db_path)
+                file.Upload()
+            return   #Exit if the file is exactly the same as in google drive
         else:
             await self.save_anything(db_path,db_path,folder_id)
 
