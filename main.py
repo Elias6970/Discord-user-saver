@@ -1,5 +1,4 @@
-# bot.py
-import os,hashlib,discord,asyncio
+import os,discord,asyncio
 import matplotlib.pyplot as plt
 from discord.ext import commands
 from datetime import timedelta
@@ -78,6 +77,11 @@ async def insert_member(member:discord.Member):
 
     db.close()
 
+
+#######################################
+###------------COMMMANDS------------###
+#######################################
+
 @bot.command(name="yo")
 async def get_last_names(ctx):
     print("Names command detected")
@@ -144,6 +148,11 @@ async def get_stats(ctx):
 @bot.command(name="a")
 async def a(ctx):
     pass
+
+
+#######################################
+###-------------EVENTS--------------###
+#######################################
 
 @bot.event
 async def on_member_update(before:discord.Member,after:discord.Member):
