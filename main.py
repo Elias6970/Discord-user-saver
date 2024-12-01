@@ -92,7 +92,7 @@ async def get_last_names(ctx):
         all_names = db.get_all_user_id_and_name(ctx.author.name)
         if all_names == []:
             raise NoLastNames
-        print(all_names)
+        
         await ctx.author.send(standard_out + "\n".join([str(i[0])+"\t"+str(i[1]) for i in all_names]))
         await ctx.send("Te envio los nombre por privado!")  # Optional feedback in the server
     
@@ -121,7 +121,8 @@ async def get_graphic_names(ctx):
         plt.title("Nombres por usuario")
         plt.axis('equal')
         plt.savefig(graph_file_name)
-
+        plt.clf()
+        
         #Send the photo
         file = discord.File(graph_file_name, filename=graph_file_name)
         await ctx.send(file=file)
