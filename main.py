@@ -144,7 +144,7 @@ async def get_stats(ctx):
     for i in info:
         returning_str += str(position) + ". " + str(i[0]) + ": " + str(i[1]) + " nombres\n"
         position += 1
-    print(returning_str)
+    
     await ctx.send(returning_str)
 
 #Send the image with the gotten id
