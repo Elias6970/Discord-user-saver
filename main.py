@@ -92,8 +92,10 @@ async def get_last_names(ctx):
         all_names = db.get_all_user_id_and_name(ctx.author.name)
         if all_names == []:
             raise NoLastNames
-        
-        await ctx.author.send(standard_out + "\n".join([str(i[0])+"\t"+str(i[1]) for i in all_names]))
+        message = standard_out + "\n".join([str(i[0])+"\t"+str(i[1]) for i in all_names])
+        for chunk in [message[i:i+2000] for i in range(0, len(message), 2000)]:
+            await ctx.author.send(chunk)
+            
         await ctx.send("Te envio los nombre por privado!")  # Optional feedback in the server
     
     except discord.Forbidden:
