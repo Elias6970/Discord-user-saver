@@ -149,6 +149,7 @@ async def get_stats(ctx):
 
 #Send the image with the gotten id
 @bot.command(name="foto",help="Devuelve la foto con ese id. Se puede combinar con stats para saber los ids")
+@commands.has_role(1312916494757396500) #Verge Esports
 async def return_photo(ctx,message:str):
     db = Db(DB_PATH)
 
@@ -158,14 +159,14 @@ async def return_photo(ctx,message:str):
         await gDriveManager.download_image(image_name,FOLDER_ID)
 
         file = discord.File(image_name, filename=image_name)
-        await ctx.send(image_name,file=file)
+        await ctx.author.send(image_name,file=file)
 
         os.remove(image_name)
         
         print("Image sent")
     
     except Exception:
-        await ctx.send("Image not found")
+        await ctx.author.send("Image not found")
 
 #######################################
 ###-------------EVENTS--------------###
